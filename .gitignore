@@ -1,0 +1,7 @@
+node_modules/
+dist/
+scripts/_dump.json
+scripts/_ids.mjs
+scripts/__pycache__/
+*.log
+.DS_Store
