@@ -35,14 +35,14 @@ export function Home() {
   const tiles: [string, string, string, string][] = [
     ['lib', 'book', 'Үйрену', 'Тақырыптар, түсіндірмелер, атаулы реакциялар'],
     ['metro', 'map', 'Реакциялар картасы', 'Бір заттан екіншісіне қалай жетуге болады'],
-    ['lab', 'flask', 'Зертхана', 'Заттарды қосып, реакцияны өзің жүргіз'],
+    ['lab', 'flask', '2D / 3D конструктор', 'Молекулаларды салып, реакцияны өзің құрастыр'],
     ['practice', 'target', 'Жаттығу', '6 түрлі тапсырма және қайталау'],
   ];
   return (
     <div className="page home">
       <section className="hero">
         <h1>{prog.name ? <>Сәлем, {prog.name}!</> : <>Органикалық реакцияларды <span className="hl">көріп, түсініп</span> үйрен</>}</h1>
-        <p className="lead">Әр реакцияда атомдардың қалай жылжитынын анимациямен көр, неге солай жүретінін оқы, кейін өзіңді тексер.</p>
+        <p className="lead">Атомдардың қалай жылжитынын анимациямен көр, молекулаларды 2D және 3D конструкторда сал, кейін өзіңді тексер.</p>
         <form className="bigsearch" role="search" onSubmit={(e) => { e.preventDefault(); sessionStorageSet('q', q); go('lib'); }}>
           <Icon n="search" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Реакцияны іздеу: этанол, C2H4, бромдау…" aria-label="Реакцияны іздеу" />
