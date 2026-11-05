@@ -65,7 +65,7 @@ export default function App() {
         <div className="top-in">
           <A to="" className="logo" title="Органика — басты бет">
             <svg width="30" height="30" viewBox="0 0 28 28" aria-hidden><polygon points="14,2 25,8.5 25,19.5 14,26 3,19.5 3,8.5" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="14" cy="14" r="4.2" fill="var(--accent)" /></svg>
-            <span>Органика</span>
+            <span>Органика <small className="logo-lab">LAB</small></span>
           </A>
           <nav className="nav" aria-label="Негізгі мәзір">
             {NAV.map(([to, l, ic]) => <A key={to} to={to} className={sec === to ? 'on' : ''}><Icon n={ic} size={20} /><span>{l}</span></A>)}

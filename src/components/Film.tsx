@@ -38,6 +38,8 @@ interface Props {
   /** Жоғарыдағы шағын жол (видеодағы «葡萄糖 → 乙醇 · …» сияқты) */
   crumb?: string;
   compact?: boolean;
+  /** Оқушы режимі: тек ойнату және қадамдар басқаруы қалдырылады */
+  simple?: boolean;
   onClose?: () => void;
 }
 
@@ -48,7 +50,7 @@ function mainSides(rid: string, step: FilmStep) {
   return { from, to };
 }
 
-export function Film({ steps, title, autoplay, loop, crumb, compact, onClose }: Props) {
+export function Film({ steps, title, autoplay, loop, crumb, compact, simple, onClose }: Props) {
   const prog = useProgress();
   const reduce = prog.motion === 'reduce' || (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [num, setNum] = useState<boolean>(localNum.get() ?? true);
@@ -218,11 +220,13 @@ export function Film({ steps, title, autoplay, loop, crumb, compact, onClose }: 
         <button className="fbtn main" onClick={() => { if (i === valid.length - 1 && phase === 3) { setI(0); setPhase(0); } setPlaying((p) => !p); }} aria-label={playing ? 'Тоқтату' : 'Ойнату'}>
           <Icon n={playing ? 'pause' : 'play'} />{playing ? 'Тоқтату' : i === valid.length - 1 && phase === 3 ? 'Қайта көру' : 'Ойнату'}
         </button>
-        <button className="fbtn" onClick={() => { setPlaying(false); next(); }} disabled={i === valid.length - 1 && phase === 3} aria-label="Келесі"><Icon n="next" /></button>
-        <span className="film-sep" />
-        <button className="fbtn sm" aria-pressed={num} onClick={() => { setNum(!num); localNum.set(!num); }} title="Көміртекті нөмірлеу">{num ? 'C1, C2…' : 'CH₃, CH₂…'}</button>
-        <button className="fbtn sm" onClick={fullscreen} title="Толық экран">⛶</button>
-        <A to={'r-' + r.id} className="fbtn sm link">Карточка</A>
+        <button className="fbtn next-step" onClick={() => { setPlaying(false); next(); }} disabled={i === valid.length - 1 && phase === 3} aria-label="Келесі қадам"><span>Келесі қадам</span><Icon n="next" /></button>
+        {!simple && <>
+          <span className="film-sep" />
+          <button className="fbtn sm" aria-pressed={num} onClick={() => { setNum(!num); localNum.set(!num); }} title="Көміртекті нөмірлеу">{num ? 'C1, C2…' : 'CH₃, CH₂…'}</button>
+          <button className="fbtn sm" onClick={fullscreen} title="Толық экран">⛶</button>
+          <A to={'r-' + r.id} className="fbtn sm link">Карточка</A>
+        </>}
       </div>
       <div className="film-bar" aria-hidden>
         {segColors.map((c, k) => <span key={k}><i style={{ width: segFill[k] * 100 + '%', background: c }} /></span>)}
