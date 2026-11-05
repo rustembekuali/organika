@@ -10,8 +10,10 @@
     "gen:structures": "tsx scripts/dump.ts scripts/_dump.json && python3 scripts/gen_structures.py scripts/_dump.json src/data/generated/structures.json && python3 scripts/gen_scenes.py scripts/_dump.json src/data/generated/scenes.json"
   },
   "dependencies": {
+    "@types/three": "^0.187.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
