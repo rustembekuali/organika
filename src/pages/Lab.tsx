@@ -13,6 +13,8 @@ import { Structure, hasStructure } from '../components/Structure';
 import { Film, hasScene } from '../components/Film';
 import { Equation, ReactionPlayer } from '../components/Reaction';
 import { A, Icon, ClassChip } from '../components/ui';
+import { ConstructorLab } from './ConstructorLab';
+import { StudentLab } from './StudentLab';
 
 const REAGENTS = ['h2', 'h2o', 'br2', 'cl2', 'hbr', 'hcl', 'hi', 'o2', 'o_ox', 'h_red', 'naoh', 'koh', 'na', 'cuo', 'ag2o', 'cuoh2', 'kmno4', 'hno3', 'h2so4', 'nh3', 'hcn', 'nahso3', 'fecl3', 'co', 'co2', 'c', 'cac2', 'al4c3', 'na2co3', 'cao', 'ca', 'na2o', 'nanh2'];
 const CONDS = ['t°', 'hν', 'кат.', 'p', 'Ni', 'H₂SO₄ (конц.)', 'AlCl₃', 'HgSO₄', 'спирттегі ерітінді', 'сулы ерітінді', 'NH₃ (ерітінді)'];
@@ -334,18 +336,22 @@ function CustomFilm({ r }: { r: CustomReaction }) {
 }
 
 export function Lab() {
-  const [tab, setTab] = useState<'run' | 'edit'>('run');
+  const [advanced, setAdvanced] = useState(false);
+  const [tab, setTab] = useState<'constructor' | 'run' | 'edit'>('constructor');
+  if (!advanced) return <div className="page lab"><StudentLab onAdvanced={() => setAdvanced(true)} /></div>;
   return (
     <div className="page lab">
-      <header className="phead">
-        <h1>Зертхана</h1>
-        <p className="lead">Реакцияны өзің құрастыр: заттарды сахнаға сүйреп әкел (телефонда — басу жеткілікті). Базада осындай реакция болса, ол видеодағыдай анимациямен көрсетіледі. Өз реакцияңды қосып, теңестіріп, сақтауға да болады.</p>
+      <button className="lab-back" onClick={() => setAdvanced(false)}>← Оқу режиміне оралу</button>
+      <header className="phead lab-page-head">
+        <div><span className="page-kicker">ҚОСЫМША ҚҰРАЛДАР</span><h1>Еркін зертхана</h1></div>
+        <p className="lead">Молекула салу, кез келген заттармен тәжірибе және формула редакторы.</p>
       </header>
-      <div className="seg big-seg" role="tablist">
-        <button role="tab" aria-selected={tab === 'run'} className={tab === 'run' ? 'on' : ''} onClick={() => setTab('run')}>Реакцияны өзің жүргіз</button>
-        <button role="tab" aria-selected={tab === 'edit'} className={tab === 'edit' ? 'on' : ''} onClick={() => setTab('edit')}>Өз реакцияңды қос</button>
+      <div className="seg big-seg lab-tabs" role="tablist" aria-label="Зертхана режимдері">
+        <button role="tab" aria-selected={tab === 'constructor'} className={tab === 'constructor' ? 'on' : ''} onClick={() => setTab('constructor')}>2D / 3D конструктор</button>
+        <button role="tab" aria-selected={tab === 'run'} className={tab === 'run' ? 'on' : ''} onClick={() => setTab('run')}>Еркін тәжірибе</button>
+        <button role="tab" aria-selected={tab === 'edit'} className={tab === 'edit' ? 'on' : ''} onClick={() => setTab('edit')}>Формула редакторы</button>
       </div>
-      {tab === 'run' ? <RunLab /> : <EditorLab />}
+      {tab === 'constructor' ? <ConstructorLab /> : tab === 'run' ? <RunLab /> : <EditorLab />}
     </div>
   );
 }
