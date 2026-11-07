@@ -1,4 +1,5 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { recordNamesRound } from '../lib/store';
 import { NAME_GROUPS, ALL_NAMES, ROOTS, ENDINGS, BUILD_CLS, buildName, type BuildCls, type NameItem, type NameGroup } from '../data/names';
 import { SUBSTANCES } from '../data/substances';
 import { F } from '../lib/format';
@@ -19,7 +20,7 @@ export function subOf(it: { sys: string; triv?: string }): string | undefined {
 
 const PARTS: [string, string][] = [['all', 'Барлығы'], ['hc', 'Көмірсутектер'], ['o', 'Оттекті'], ['n', 'Азотты']];
 
-export function NamesPage() {
+export function NamesPage({ part }: { part?: string } = {}) {
   return (
     <div className="page names">
       <LearnTabs on="names" />
@@ -30,7 +31,7 @@ export function NamesPage() {
       <Roots />
       <Endings />
       <Builder />
-      <Trainer />
+      <Trainer initialPart={part} />
       <NameTables />
     </div>
   );
@@ -131,8 +132,11 @@ function makeQ(pool: Item[], mode: Mode, asked: string[] = []): Q {
 
 const ROUND = 10;
 
-function Trainer() {
-  const [part, setPart] = useState('all');
+function Trainer({ initialPart }: { initialPart?: string }) {
+  const [part, setPart] = useState(initialPart && PARTS.some(([id]) => id === initialPart) ? initialPart : 'all');
+  const box = useRef<HTMLElement>(null);
+  // нұсқаулықтан келгенде бірден жаттығуға түсеміз
+  useEffect(() => { if (initialPart) box.current?.scrollIntoView({ block: 'start' }); }, [initialPart]);
   const [mode, setMode] = useState<Mode>('f2n');
   const pool = useMemo(() => (ALL_NAMES.filter((x) => (part === 'all' || x.g.part === part) && !x.f.includes('n)'))), [part]);
   const q0 = useRef<Q>(makeQ(pool, mode));
@@ -141,18 +145,20 @@ function Trainer() {
   const [score, setScore] = useState(0);
   const [pick, setPick] = useState<number | null>(null);
   const [wrong, setWrong] = useState<Item[]>([]);
+  const [okKeys, setOkKeys] = useState<string[]>([]);
   const [asked, setAsked] = useState<string[]>(() => [keyOf(q0.current.it)]);
   const restart = (p = part, m = mode) => {
     const pl = ALL_NAMES.filter((x) => (p === 'all' || x.g.part === p) && !x.f.includes('n)'));
     const nq = makeQ(pl, m);
-    setQ(nq); setAsked([keyOf(nq.it)]); setK(0); setScore(0); setPick(null); setWrong([]);
+    setQ(nq); setAsked([keyOf(nq.it)]); setK(0); setScore(0); setPick(null); setWrong([]); setOkKeys([]);
   };
   const choose = (i: number) => {
     if (pick !== null) return;
     setPick(i);
-    if (i === q.answer) setScore((s) => s + 1); else setWrong((w) => [...w, q.it]);
+    if (i === q.answer) { setScore((s) => s + 1); setOkKeys((o) => [...o, keyOf(q.it)]); } else setWrong((w) => [...w, q.it]);
   };
   const nextQ = () => {
+    if (k + 1 >= ROUND) { recordNamesRound(part, score, okKeys); setK(ROUND); return; }
     const nq = makeQ(pool, mode, asked);
     setK((x) => x + 1); setPick(null); setQ(nq); setAsked((a) => [...a, keyOf(nq.it)]);
   };
@@ -160,7 +166,7 @@ function Trainer() {
   const nm = (x: Item) => x.sys + (x.triv ? ' (' + x.triv + ')' : '');
 
   return (
-    <section className="card trainer" aria-live="polite">
+    <section className="card trainer" aria-live="polite" ref={box} id="trainer">
       <h2 className="h-card">4-қадам. Өзіңді тексер</h2>
       <div className="row gap wrap trainer-ctl">
         <div className="seg">{PARTS.map(([id, l]) => <button key={id} className={part === id ? 'on' : ''} onClick={() => { setPart(id); restart(id, mode); }}>{l}</button>)}</div>
@@ -171,7 +177,7 @@ function Trainer() {
           <div className="td-score"><b>{score}</b>/{ROUND}</div>
           <p>{score === ROUND ? 'Керемет! Барлығы дұрыс.' : score >= 7 ? 'Жақсы нәтиже. Қателерді тағы бір қарап шық.' : 'Түбір мен жұрнақ кестесін қайта қарап, тағы байқап көр.'}</p>
           {wrong.length > 0 && <ul className="plain">{wrong.map((w, i) => <li key={i}><F s={w.f} /> — <b>{nm(w)}</b> <span className="muted small">· {w.g.title}</span></li>)}</ul>}
-          <button className="btn" onClick={() => restart()}>Қайтадан бастау</button>
+          <div className="row gap wrap"><button className="btn" onClick={() => restart()}>Қайтадан бастау</button><A to="guide" className="btn ghost">Оқу жолына оралу</A></div>
         </div>
       ) : (
         <>

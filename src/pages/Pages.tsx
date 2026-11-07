@@ -19,6 +19,7 @@ import { STATION_IDS, metroIntent } from '../lib/graph';
 import { OrganicCursor } from '../components/OrganicCursor';
 import { Contours } from '../components/Contours';
 import { ALL_NAMES } from '../data/names';
+import { guideSteps } from './Guide';
 
 const usableCount = REACTIONS.filter(usable).length;
 
@@ -34,6 +35,8 @@ export function Home() {
   const lastCount = last ? reactionsOf(last.id).length : 0;
   const lastSeen = last ? reactionsOf(last.id).filter((r) => prog.viewed[r.id]).length : 0;
   const isNew = viewed === 0 && !last;
+  const gs = guideSteps(prog);
+  const guideAll = gs.length, guideDone = gs.filter((x) => x.done).length, guideLeft = guideAll - guideDone;
   const nextTopic = LEARNING_PATH.find((p) => { const rs = reactionsOf(p.topic); return rs.some((r) => !prog.viewed[r.id]); });
   const classes = Object.entries(CLASS_INFO).filter(([k]) => !['inorg', 'other', 'salt', 'nitro'].includes(k));
   const tiles: [string, string, string, string][] = [
@@ -62,7 +65,7 @@ export function Home() {
               <button className="btn">Іздеу</button>
             </form>
             <div className="hero-actions">
-              <A to={isNew ? 't-alkanes' : nextTopic ? 't-' + nextTopic.topic : 'lib'} className="cut-btn">
+              <A to={isNew ? 'guide' : nextTopic ? 't-' + nextTopic.topic : 'lib'} className="cut-btn">
                 <span>{isNew ? 'Оңайынан бастау' : 'Оқуды бастау'}</span>
                 <svg className="cut-arrow" viewBox="0 0 14 11" aria-hidden><path d="M0 5.5H13M8 .5l5 5-5 5" fill="none" stroke="currentColor" /></svg>
               </A>
@@ -97,7 +100,7 @@ export function Home() {
             <li><A to="t-alkanes"><b>Алкандар — ең оңай бөлім</b></A><span className="muted">Метан мен этан: жану және хлорлану. Алдымен тек базалық реакциялар көрсетіледі</span></li>
             <li><A to="t-alkenes"><b>Алкендер</b></A><span className="muted">Қос байланыс және оңай қосылу реакциялары</span></li>
           </ol>
-          <div className="row gap wrap"><A to="t-alkanes" className="btn">Алкандардан бастау <Icon n="arrow" size={16} /></A><A to="lib" className="btn ghost">Барлық тақырыптар</A></div>
+          <div className="row gap wrap"><A to="guide" className="btn">Қадамдық нұсқаулықпен бастау <Icon n="arrow" size={16} /></A><A to="t-alkanes" className="btn ghost">Бірден алкандарға</A></div>
         </section>
       )}
 
@@ -110,6 +113,7 @@ export function Home() {
           </div>
           <div className="continue-side">
             <Meter v={viewed} max={REACTIONS.length} label={`Барлығы: ${viewed}/${REACTIONS.length}`} />
+            {guideLeft > 0 && <A to="guide" className="btn ghost sm">Оқу жолы: {guideDone}/{guideAll} қадам</A>}
             {prog.review.length > 0 && <A to="p-review" className="btn ghost sm">Қайталау керек: {prog.review.length}</A>}
           </div>
         </section>
