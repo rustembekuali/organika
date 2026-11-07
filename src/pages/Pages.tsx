@@ -18,6 +18,7 @@ import { A, ClassChip, Icon, Empty, LevelBadge, StatusBadge, go, subHash, LearnT
 import { STATION_IDS, metroIntent } from '../lib/graph';
 import { OrganicCursor } from '../components/OrganicCursor';
 import { Contours } from '../components/Contours';
+import { ALL_NAMES } from '../data/names';
 
 const usableCount = REACTIONS.filter(usable).length;
 
@@ -92,6 +93,7 @@ export function Home() {
           <h2 className="h-card">Жаңадан бастап жатырсың ба? Оңайдан баста</h2>
           <ol className="starter-steps">
             <li><A to="s-valence"><b>Көміртек не үшін төрт байланыс түзеді?</b></A><span className="muted">Қысқа теория — осы ұғым барлық реакцияны түсінуге керек</span></li>
+            <li><A to="names"><b>Атауларды үйрен</b></A><span className="muted">Түбір көміртек санын, жұрнақ класты көрсетеді: проп + ан = пропан. Құрастырғыш пен жаттығу бар</span></li>
             <li><A to="t-alkanes"><b>Алкандар — ең оңай бөлім</b></A><span className="muted">Метан мен этан: жану және хлорлану. Алдымен тек базалық реакциялар көрсетіледі</span></li>
             <li><A to="t-alkenes"><b>Алкендер</b></A><span className="muted">Қос байланыс және оңай қосылу реакциялары</span></li>
           </ol>
@@ -520,6 +522,11 @@ export function Practice() {
             </A>
           );
         })}
+        <A to="names" className="mode-card">
+          <span className="mc-t">Атауын тап</span>
+          <span className="mc-d">Формула бойынша атауды немесе атау бойынша формуланы тап: көмірсутектер, оттекті және азотты қосылыстар.</span>
+          <span className="mc-s muted small">{ALL_NAMES.length} атау</span>
+        </A>
         <A to="p-review" className={'mode-card review' + (prog.review.length ? '' : ' empty-card')}>
           <span className="mc-t">Қайталау тізімі</span>
           <span className="mc-d">Қате орындалған тапсырмалар қайта ұсынылады.</span>
@@ -722,6 +729,17 @@ export function Sources() {
           <li><StatusBadge st="check" /> — күмәнді жазба; ойдан толықтырылмады, жаттығулар мен реакциялар картасына енгізілмеді.</li>
         </ul>
         <p className="muted">Жинақтың соңындағы жеке үндеулер мен қаржылай көмек туралы мәтін сайт мазмұнына енгізілмеді.</p>
+      </section>
+      <section className="card">
+        <h2 className="h-sm">Қосымша материалдар</h2>
+        <ul>
+          <li>«Атаулар чек-листі» (Zhan_mendeleeva) және «Органикалық қосылыстар атаулары» — <A to="names">Атаулар</A> беті.</li>
+          <li>«Функционалдық топтардың сапалық реакциялары» (Архат ағай) — <A to="s-qual-table">Сапалық реакциялар кестесі</A>.</li>
+          <li>«Кластардың физикалық, химиялық қасиеттері және қолданылуы» кестесі — <A to="s-properties">Физикалық қасиеттері мен қолданылуы</A>.</li>
+          <li>«Атаулы реакциялар және ғалымдар» слайдтары — <A to="named">Атаулы реакциялар</A> (Вёлер реакциясы қосылды; Коновалов слайдындағы «C₂H₅ + HNO₃» → C₂H₆, Вёлер слайдындағы «CaC₂ + H₂O» → CaC₂ + 2H₂O, Лебедевтің туған жылы 1847 емес, 1874).</li>
+        </ul>
+        <h3 className="h-sm">Атаулардағы түзетулер</h3>
+        <ul>{ALL_NAMES.filter((x) => x.fix).map((x, i) => <li key={i}><F s={x.f} /> — <b>{x.sys}</b>: {x.fix}.</li>)}</ul>
       </section>
       <LogTable title="Тексеруді қажет етеді" rs={check} />
       <LogTable title="Жинақтан түзетілгендер" rs={fixes} />

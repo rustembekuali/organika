@@ -542,7 +542,7 @@ export const HYDROCARBONS: Reaction[] = [
   // ───────────── АЛКИНДЕР
   {
     id: 'cac2-hydrolysis', t: 'Кальций карбидінің гидролизі', at: ['alkynes:get', 'inorg:get'],
-    eq: 'cac2 + 2 h2o -> ethyne↑ + caoh2', ty: 'hydrol', lv: 'base', src: 6, st: 'ok',
+    eq: 'cac2 + 2 h2o -> ethyne↑ + caoh2', ty: 'hydrol', lv: 'base', src: 6, st: 'ok', nm: 'wohler',
     ob: 'Газ бөлінеді (ацетилен).',
     b: 'Ca–C иондық байланысы және H–O байланыстары үзіледі; C–H және Ca–OH байланыстары түзіледі.',
     x: 'Кальций карбидіндегі C₂²⁻ ионы судан протон алып, ацетиленге айналады. Бұл — ацетиленнің зертханалық алынуы.',

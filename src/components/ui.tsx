@@ -76,8 +76,8 @@ export function Empty({ children }: { children: React.ReactNode }) {
 }
 
 /** «Үйрену» бөлімінің ішкі қойындылары */
-export function LearnTabs({ on }: { on: 'lib' | 'school' | 'named' }) {
-  const t: [string, string][] = [['lib', 'Тақырыптар'], ['school', 'Негіздер'], ['named', 'Атаулы реакциялар']];
+export function LearnTabs({ on }: { on: 'lib' | 'school' | 'named' | 'names' }) {
+  const t: [string, string][] = [['lib', 'Тақырыптар'], ['school', 'Негіздер'], ['names', 'Атаулар'], ['named', 'Атаулы реакциялар']];
   return (
     <nav className="learn-tabs" aria-label="Үйрену бөлімдері">
       {t.map(([k, l]) => <A key={k} to={k} className={on === k ? 'on' : ''}>{l}</A>)}
