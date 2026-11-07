@@ -1145,3 +1145,42 @@ select, input[type=number], input[type=search], .name-in { border-radius: 2px; }
 .starter-steps a { color: var(--fg); }
 .starter-steps a:hover { color: var(--accent-ink); text-decoration: none; }
 .level-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 4px 0 14px; }
+
+/* Атаулар беті */
+.root-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.root-cell { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); background: var(--card2); }
+.rc-n { font-family: var(--font-display); color: var(--accent-ink); font-size: .85rem; letter-spacing: .06em; }
+.rc-r { font-family: var(--font-display); font-size: 1.6rem; line-height: 1; text-transform: uppercase; }
+.rc-ex { font-size: .82rem; }
+.end-hl { color: var(--accent-ink); font-family: var(--font-display); font-weight: 600; letter-spacing: .03em; }
+.builder-ctl { display: grid; gap: 12px; margin-bottom: 16px; }
+.builder-ctl .seg button:disabled { opacity: .35; cursor: default; }
+.builder-out { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; padding: 16px; border: 1px dashed var(--line2); }
+.bo-main { display: grid; gap: 8px; justify-items: start; }
+.bo-f { font-size: 2rem; font-weight: 600; }
+.bo-name { display: flex; flex-wrap: wrap; gap: 6px; }
+.bo-part { padding: 3px 10px; font-family: var(--font-display); font-size: 1.05rem; letter-spacing: .03em; border: 1px solid var(--line2); }
+.bo-part.p0 { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.bo-part.p1 { border-color: var(--accent); color: var(--accent-ink); }
+.bo-res { font-size: 1.3rem; }
+.bo-res b { font-family: var(--font-display); font-weight: 600; letter-spacing: .02em; font-size: 1.6rem; }
+.bo-struct { min-width: 180px; }
+.trainer-ctl { margin-bottom: 14px; }
+.trainer-q { font-size: 1.05rem; margin: 10px 0 14px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.tq-big { font-family: var(--font-display); font-size: 1.9rem; letter-spacing: .02em; }
+.trainer-done { display: grid; gap: 10px; justify-items: start; }
+.td-score { font-family: var(--font-display); font-size: 1.6rem; }
+.td-score b { font-size: 3rem; color: var(--accent-ink); }
+.name-groups { display: grid; gap: 10px; }
+.name-group { padding: 0; }
+.name-group > summary { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; list-style: none; }
+.name-group > summary::-webkit-details-marker { display: none; }
+.name-group > summary::before { content: '+'; font-family: var(--font-display); color: var(--accent-ink); width: 14px; }
+.name-group[open] > summary::before { content: '−'; }
+.name-group > :not(summary) { padding: 0 18px; }
+.name-group > .tablewrap { padding-bottom: 14px; }
+.ng-t { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .03em; font-size: 1.1rem; }
+.ng-gen { color: var(--accent-ink); margin-right: auto; }
+.name-fix { font-size: .76rem; color: var(--muted); margin-top: 3px; }
+.name-fix::before { content: '⚠ '; color: var(--accent-ink); }
+@media (max-width: 640px) { .root-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bo-f { font-size: 1.6rem; } }

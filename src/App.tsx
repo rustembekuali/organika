@@ -6,6 +6,7 @@ import { MetroPage } from './pages/Metro';
 import { Home, Library, TopicPage, NamedList, NamedPage, School, SchoolPage, Practice, PracticeMode, ProgressPage, SubstancePage, Sources } from './pages/Pages';
 import type { Mode } from './lib/quiz';
 import { Lab } from './pages/Lab';
+import { NamesPage } from './pages/Names';
 
 // Негізгі мәзір — 5 бөлім (телефонда төменгі панель)
 const NAV: [string, string, string][] = [
@@ -22,6 +23,7 @@ function route(h: string) {
   if (h === 'practice') return <Practice />;
   if (h.startsWith('p-')) return <PracticeMode mode={h.slice(2) as Mode | 'review'} />;
   if (h === 'named') return <NamedList />;
+  if (h === 'names') return <NamesPage />;
   if (h.startsWith('n-')) return <NamedPage id={h.slice(2)} />;
   if (h === 'school') return <School />;
   if (h.startsWith('s-')) return <SchoolPage id={h.slice(2)} />;
@@ -33,7 +35,7 @@ function route(h: string) {
 
 function section(h: string) {
   if (!h || h === 'home') return '';
-  if (/^(t-|r-|z-|s-|n-)/.test(h) || ['lib', 'school', 'named', 'sources'].includes(h)) return 'lib';
+  if (/^(t-|r-|z-|s-|n-)/.test(h) || ['lib', 'school', 'named', 'names', 'sources'].includes(h)) return 'lib';
   if (h.startsWith('p-')) return 'practice';
   return h;
 }
