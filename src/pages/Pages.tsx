@@ -16,6 +16,8 @@ import { Structure, hasStructure } from '../components/Structure';
 import { Film, FilmOverlay, type FilmStep } from '../components/Film';
 import { A, ClassChip, Icon, Empty, LevelBadge, StatusBadge, go, subHash, LearnTabs } from '../components/ui';
 import { STATION_IDS, metroIntent } from '../lib/graph';
+import { OrganicCursor } from '../components/OrganicCursor';
+import { Contours } from '../components/Contours';
 
 const usableCount = REACTIONS.filter(usable).length;
 
@@ -40,14 +42,48 @@ export function Home() {
   ];
   return (
     <div className="page home">
-      <section className="hero">
-        <h1>{prog.name ? <>Сәлем, {prog.name}!</> : <>Органикалық реакцияларды <span className="hl">көріп, түсініп</span> үйрен</>}</h1>
-        <p className="lead">Атомдардың қалай жылжитынын анимациямен көр, молекулаларды 2D және 3D конструкторда сал, кейін өзіңді тексер.</p>
-        <form className="bigsearch" role="search" onSubmit={(e) => { e.preventDefault(); sessionStorageSet('q', q); go('lib'); }}>
-          <Icon n="search" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Реакцияны іздеу: этанол, C2H4, бромдау…" aria-label="Реакцияны іздеу" />
-          <button className="btn">Іздеу</button>
-        </form>
+      <OrganicCursor />
+      <section className="hero hero-lab">
+        <Contours />
+        <div className="hero-grid">
+          <div className="hero-main">
+            <div className="hero-id">органика_lab / оқу платформасы</div>
+            <h1 className="hero-title">{prog.name ? <>Сәлем, {prog.name}</> : <>Органикалық реакцияларды <span className="hl">көріп, түсініп</span> үйрен</>}</h1>
+            <ul className="hero-meta">
+              <li><Icon n="flask" size={18} /> Атомдар қозғалатын анимациялар</li>
+              <li><Icon n="map" size={18} /> Реакциялар картасы мен зертхана</li>
+              <li><Icon n="target" size={18} /> Жаттығу және өзіңді тексеру</li>
+            </ul>
+            <form className="bigsearch" role="search" onSubmit={(e) => { e.preventDefault(); sessionStorageSet('q', q); go('lib'); }}>
+              <Icon n="search" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Реакцияны іздеу: этанол, C2H4, бромдау…" aria-label="Реакцияны іздеу" />
+              <button className="btn">Іздеу</button>
+            </form>
+            <div className="hero-actions">
+              <A to={nextTopic ? 't-' + nextTopic.topic : 'lib'} className="cut-btn">
+                <span>Оқуды бастау</span>
+                <svg className="cut-arrow" viewBox="0 0 14 11" aria-hidden><path d="M0 5.5H13M8 .5l5 5-5 5" fill="none" stroke="currentColor" /></svg>
+              </A>
+              <A to="lab" className="hero-link">Зертхана</A>
+              <A to="practice" className="hero-link">Жаттығу</A>
+            </div>
+          </div>
+          <aside className="hero-side" aria-label="Қысқаша мәлімет">
+            <div className="bracket-panel">
+              <div className="bp-eyebrow">Келесі тақырып</div>
+              <div className="bp-title">{nextTopic ? <A to={'t-' + nextTopic.topic}>{TOPIC[nextTopic.topic].name}</A> : <A to="lib">Тақырыптар</A>}</div>
+              <svg className="bp-mol" viewBox="0 0 120 80" fill="none" stroke="var(--accent)" aria-hidden><path d="m20 50 35-30 35 20-20 30Z" /><circle cx="20" cy="50" r="8" /><circle cx="55" cy="20" r="8" /><circle cx="90" cy="40" r="8" /><circle cx="70" cy="70" r="8" /></svg>
+            </div>
+            <div className="bracket-panel">
+              <div className="bp-eyebrow">Оқу статистикасы</div>
+              <dl className="bp-stats">
+                <div><dt>Реакция</dt><dd>{REACTIONS.length}</dd></div>
+                <div><dt>Зат</dt><dd>{SUBSTANCES.length}</dd></div>
+                <div><dt>Тақырып</dt><dd>{TOPICS.length}</dd></div>
+              </dl>
+            </div>
+          </aside>
+        </div>
       </section>
 
       {!prog.name ? <NameCard /> : (
