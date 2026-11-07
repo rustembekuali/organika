@@ -1136,3 +1136,12 @@ select, input[type=number], input[type=search], .name-in { border-radius: 2px; }
   .hero-side { grid-template-columns: 1fr; }
   .cut-btn { width: 100%; justify-content: space-between; }
 }
+
+/* Жаңа оқушыға арналған бастау картасы және деңгей сүзгісі */
+.starter { margin-top: 8px; }
+.starter-steps { list-style: none; counter-reset: st; padding: 0; margin: 0 0 14px; display: grid; gap: 10px; }
+.starter-steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; align-items: baseline; }
+.starter-steps li::before { content: counter(st); grid-row: span 2; align-self: start; display: grid; place-items: center; width: 30px; height: 30px; background: var(--accent); color: var(--accent-fg); font-family: var(--font-display); font-weight: 600; }
+.starter-steps a { color: var(--fg); }
+.starter-steps a:hover { color: var(--accent-ink); text-decoration: none; }
+.level-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 4px 0 14px; }

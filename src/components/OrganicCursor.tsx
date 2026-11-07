@@ -76,6 +76,8 @@ export function OrganicCursor() {
       if (!seen) { seen = true; place(target.x, target.y); }
       visT = 1;
       const el = e.target instanceof Element ? e.target : null;
+      // реакция анимациясының үстінде курсорды жасырамыз — көрінуге де, жеңіл жүруге де кедергі болмасын
+      if (el?.closest('.film, .player, .hero-film')) { visT = 0; return; }
       sizeT = el?.closest('a, button, input, select, textarea, label, [role=button]') ? 1.65 : 1;
     };
     const onLeave = () => { visT = 0; };
@@ -126,11 +128,13 @@ export function OrganicCursor() {
       const g = ctx.createRadialGradient(head.x - R * 0.35, head.y - R * 0.4, R * 0.1, head.x, head.y, R * 1.7);
       g.addColorStop(0, `rgba(${CYAN}, .78)`);
       g.addColorStop(1, `rgba(${CYAN}, .3)`);
-      ctx.shadowColor = `rgba(${CYAN}, .55)`;
-      ctx.shadowBlur = 22;
+      const halo = ctx.createRadialGradient(head.x, head.y, R * 0.6, head.x, head.y, R * 2.4);
+      halo.addColorStop(0, `rgba(${CYAN}, .28)`);
+      halo.addColorStop(1, `rgba(${CYAN}, 0)`);
+      ctx.fillStyle = halo;
+      ctx.fillRect(head.x - R * 2.4, head.y - R * 2.4, R * 4.8, R * 4.8);
       ctx.fillStyle = g;
       ctx.fill(path, 'nonzero');
-      ctx.shadowBlur = 0;
       ctx.lineWidth = 1.2;
       ctx.strokeStyle = `rgba(${CYAN}, .95)`;
       ctx.stroke(headPath);

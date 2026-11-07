@@ -32,6 +32,7 @@ export function Home() {
   const last = prog.lastTopic ? TOPIC[prog.lastTopic] : null;
   const lastCount = last ? reactionsOf(last.id).length : 0;
   const lastSeen = last ? reactionsOf(last.id).filter((r) => prog.viewed[r.id]).length : 0;
+  const isNew = viewed === 0 && !last;
   const nextTopic = LEARNING_PATH.find((p) => { const rs = reactionsOf(p.topic); return rs.some((r) => !prog.viewed[r.id]); });
   const classes = Object.entries(CLASS_INFO).filter(([k]) => !['inorg', 'other', 'salt', 'nitro'].includes(k));
   const tiles: [string, string, string, string][] = [
@@ -60,8 +61,8 @@ export function Home() {
               <button className="btn">Іздеу</button>
             </form>
             <div className="hero-actions">
-              <A to={nextTopic ? 't-' + nextTopic.topic : 'lib'} className="cut-btn">
-                <span>Оқуды бастау</span>
+              <A to={isNew ? 't-alkanes' : nextTopic ? 't-' + nextTopic.topic : 'lib'} className="cut-btn">
+                <span>{isNew ? 'Оңайынан бастау' : 'Оқуды бастау'}</span>
                 <svg className="cut-arrow" viewBox="0 0 14 11" aria-hidden><path d="M0 5.5H13M8 .5l5 5-5 5" fill="none" stroke="currentColor" /></svg>
               </A>
               <A to="lab" className="hero-link">Зертхана</A>
@@ -85,6 +86,18 @@ export function Home() {
           </aside>
         </div>
       </section>
+
+      {isNew && (
+        <section className="card starter" aria-label="Қайдан бастау керек">
+          <h2 className="h-card">Жаңадан бастап жатырсың ба? Оңайдан баста</h2>
+          <ol className="starter-steps">
+            <li><A to="s-valence"><b>Көміртек не үшін төрт байланыс түзеді?</b></A><span className="muted">Қысқа теория — осы ұғым барлық реакцияны түсінуге керек</span></li>
+            <li><A to="t-alkanes"><b>Алкандар — ең оңай бөлім</b></A><span className="muted">Метан мен этан: жану және хлорлану. Алдымен тек базалық реакциялар көрсетіледі</span></li>
+            <li><A to="t-alkenes"><b>Алкендер</b></A><span className="muted">Қос байланыс және оңай қосылу реакциялары</span></li>
+          </ol>
+          <div className="row gap wrap"><A to="t-alkanes" className="btn">Алкандардан бастау <Icon n="arrow" size={16} /></A><A to="lib" className="btn ghost">Барлық тақырыптар</A></div>
+        </section>
+      )}
 
       {!prog.name ? <NameCard /> : (
         <section className="card continue">
@@ -269,12 +282,18 @@ function TopicCard({ id }: { id: string }) {
 // ───────────────────────── Тақырып беті
 export function TopicPage({ id }: { id: string }) {
   const t = TOPIC[id];
+  const prog = useProgress();
+  // жаңа оқушыға әдепкі бойынша тек базалық (оңай) реакциялар көрсетіледі
+  const [easy, setEasy] = useState(() => Object.keys(prog.viewed).length < 12);
   useEffect(() => { if (t) markTopic(id); }, [id]);
   if (!t) return <div className="page">Тақырып табылмады.</div>;
+  const pick = (rs: Reaction[]) => (easy ? rs.filter((r) => r.lv === 'base') : rs);
+  const all = [reactionsOf(id, 'get'), reactionsOf(id, 'prop'), reactionsOf(id, 'qual')];
+  const hidden = all.reduce((n, rs) => n + rs.length - pick(rs).length, 0);
   const sections: [string, Reaction[]][] = [
-    ['Алыну жолдары', reactionsOf(id, 'get')],
-    ['Химиялық қасиеттері', reactionsOf(id, 'prop')],
-    ['Сапалық реакциялар', reactionsOf(id, 'qual')],
+    ['Алыну жолдары', pick(all[0])],
+    ['Химиялық қасиеттері', pick(all[1])],
+    ['Сапалық реакциялар', pick(all[2])],
   ];
   const idx = TOPICS.findIndex((x) => x.id === id);
   const prev = TOPICS[idx - 1], next = TOPICS[idx + 1];
@@ -286,6 +305,13 @@ export function TopicPage({ id }: { id: string }) {
         <h1>{t.name}</h1>
         <p className="lead">{t.intro}</p>
       </header>
+      <div className="level-bar">
+        <div className="seg" role="group" aria-label="Деңгей">
+          <button className={easy ? 'on' : ''} aria-pressed={easy} onClick={() => setEasy(true)}>Оңайдан бастау</button>
+          <button className={!easy ? 'on' : ''} aria-pressed={!easy} onClick={() => setEasy(false)}>Барлық реакция</button>
+        </div>
+        {easy && hidden > 0 && <span className="muted small">Базалық деңгей көрсетілді. Тағы {hidden} күрделірек реакция бар — «Барлық реакция» батырмасын бас.</span>}
+      </div>
       <nav className="toc" aria-label="Бөлімдер">
         {sections.map(([n, rs], i) => <a key={n} href={'#t-' + id} onClick={(e) => { e.preventDefault(); document.getElementById('sec' + i)?.scrollIntoView({ behavior: 'smooth' }); }}>{n} ({rs.length})</a>)}
         <a href={'#t-' + id} onClick={(e) => { e.preventDefault(); document.getElementById('sec3')?.scrollIntoView({ behavior: 'smooth' }); }}>Жиі қателер</a>
