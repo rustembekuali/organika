@@ -44,7 +44,9 @@ export function OrganicCursor() {
 
   useEffect(() => {
     if (off) return;
-    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Телефон мен планшетте тышқан жоқ: жаратылыс басты беттің жоғарғы бөлігінде өздігінен жүзеді, саусаққа ілеседі
+    const touchMode = !matchMedia('(hover: hover) and (pointer: fine)').matches;
     const cv = ref.current;
     const ctx = cv?.getContext('2d');
     if (!cv || !ctx) return;
@@ -64,6 +66,7 @@ export function OrganicCursor() {
     const atoms = Array.from({ length: ATOMS }, (_, i) => ({ x: -300, y: -300, vx: 0, vy: 0, phase: (i / ATOMS) * Math.PI * 2, r: 4.5 + i * 1.4 }));
     const ripples: Ripple[] = [];
     let seen = false, vis = 0, visT = 0, size = 1, sizeT = 1;
+    let touchUntil = 0;
 
     const place = (x: number, y: number) => {
       head.x = x; head.y = y; head.vx = head.vy = 0;
@@ -82,6 +85,27 @@ export function OrganicCursor() {
     };
     const onLeave = () => { visT = 0; };
     const onDown = (e: PointerEvent) => { if (e.pointerType === 'mouse') ripples.push({ x: e.clientX, y: e.clientY, age: 0 }); };
+    // саусақ: басқанда толқын, жүргізгенде (бетті айналдырғанда да) ілеседі
+    const fingerIn = (x: number, y: number) => {
+      const hero = document.querySelector('.hero-lab');
+      const r = hero?.getBoundingClientRect();
+      return !!r && y >= r.top && y <= r.bottom;
+    };
+    const onTouchStart = (e: TouchEvent) => {
+      const p = e.touches[0];
+      if (!p || !fingerIn(p.clientX, p.clientY)) return;
+      target.x = p.clientX; target.y = p.clientY; touchUntil = performance.now() + 1600;
+      ripples.push({ x: p.clientX, y: p.clientY, age: 0 });
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const p = e.touches[0];
+      if (!p || !fingerIn(p.clientX, p.clientY)) return;
+      target.x = p.clientX; target.y = p.clientY; touchUntil = performance.now() + 1600;
+    };
+    if (touchMode) {
+      addEventListener('touchstart', onTouchStart, { passive: true });
+      addEventListener('touchmove', onTouchMove, { passive: true });
+    }
     addEventListener('pointermove', onMove, { passive: true });
     addEventListener('pointerdown', onDown, { passive: true });
     document.documentElement.addEventListener('mouseleave', onLeave);
@@ -93,6 +117,20 @@ export function OrganicCursor() {
       last = now;
       const t = now / 1000;
 
+      if (touchMode) {
+        // басты беттің жоғарғы бөлігінде (hero) ғана: төмен айналдырғанда жоғалады
+        const hero = document.querySelector('.hero-lab');
+        const r = hero?.getBoundingClientRect();
+        const top = Math.max(r ? r.top : 0, 70) + 30, bottom = Math.min(r ? r.bottom : 0, h - 80) - 30; // шапка мен төменгі мәзірге шықпасын
+        visT = r && bottom - top > 80 ? 0.92 : 0;
+        if (r && now > touchUntil) {
+          // баяу «жүзу»: бір-біріне қабаттасқан синустар табиғи, қайталанбайтын жол береді
+          target.x = r.left + r.width * (0.5 + 0.34 * Math.sin(t * 0.31) * Math.cos(t * 0.17 + 0.6) + 0.08 * Math.sin(t * 0.83));
+          target.y = top + (bottom - top) * (0.5 + 0.38 * Math.sin(t * 0.23 + 1.3) + 0.06 * Math.cos(t * 0.71));
+        }
+        if (!seen && visT > 0) { seen = true; place(target.x, target.y); }
+        sizeT = now < touchUntil ? 1.25 : 1.1;
+      }
       vis += (visT - vis) * Math.min(1, 0.12 * dt);
       size += (sizeT - size) * Math.min(1, 0.14 * dt);
       ctx.clearRect(0, 0, w, h);
@@ -186,6 +224,8 @@ export function OrganicCursor() {
       removeEventListener('pointerdown', onDown);
       document.documentElement.removeEventListener('mouseleave', onLeave);
       removeEventListener('resize', resize);
+      removeEventListener('touchstart', onTouchStart);
+      removeEventListener('touchmove', onTouchMove);
     };
   }, [off]);
 
