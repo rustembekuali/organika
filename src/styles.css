@@ -1184,3 +1184,27 @@ select, input[type=number], input[type=search], .name-in { border-radius: 2px; }
 .name-fix { font-size: .76rem; color: var(--muted); margin-top: 3px; }
 .name-fix::before { content: '⚠ '; color: var(--accent-ink); }
 @media (max-width: 640px) { .root-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bo-f { font-size: 1.6rem; } }
+
+/* Оқу жолы (нұсқаулық) */
+.guide-sum { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; }
+.gs-num { font-family: var(--font-display); font-size: 1.4rem; }
+.gs-num b { font-size: 2.6rem; color: var(--accent-ink); }
+.gs-main { flex: 1 1 260px; display: grid; gap: 8px; }
+.gs-main .meter-b span { transition: width .4s; }
+.guide-steps { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 12px; }
+.guide-step { display: grid; gap: 10px; justify-items: start; margin: 0; }
+.guide-step .meter { width: 100%; max-width: 420px; margin: 0; }
+.gst-head { display: flex; gap: 14px; align-items: center; }
+.gst-head .h-card { margin: 0; }
+.gst-head .h-card::after { content: none; }
+.gst-n { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line2); font-family: var(--font-display); font-size: 1.2rem; color: var(--muted); }
+.gst-state { font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.guide-step p { margin: 0; }
+.gst-todo { margin: 0; padding-left: 20px; display: grid; gap: 4px; color: var(--fg2); }
+.guide-step.current { border-color: var(--accent); }
+.guide-step.current .gst-n { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.guide-step.current .gst-state { color: var(--accent-ink); }
+.guide-step.done .gst-n { border-color: var(--ok); color: var(--ok); }
+.guide-step.done .gst-state { color: var(--ok); }
+.guide-step.done .gst-todo, .guide-step.done > p { opacity: .7; }
+.teacher-note code { font-size: .85em; background: var(--card2); padding: 1px 6px; word-break: break-all; }

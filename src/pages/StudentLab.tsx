@@ -6,6 +6,7 @@ import { Film, hasScene } from '../components/Film';
 import { Structure, hasStructure } from '../components/Structure';
 import { F, formulaText } from '../lib/format';
 import { Icon } from '../components/ui';
+import { markLabRun } from '../lib/store';
 
 interface Experiment { base: string; rid: string }
 
@@ -64,8 +65,8 @@ function HeroMolecule() {
   );
 }
 
-export function StudentLab({ onAdvanced }: { onAdvanced: () => void }) {
-  const [base, setBase] = useState('ethene');
+export function StudentLab({ onAdvanced, initialBase }: { onAdvanced: () => void; initialBase?: string }) {
+  const [base, setBase] = useState(initialBase && BASES.includes(initialBase) ? initialBase : 'ethene');
   const [rid, setRid] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [runKey, setRunKey] = useState(0);
@@ -83,9 +84,11 @@ export function StudentLab({ onAdvanced }: { onAdvanced: () => void }) {
     setRid(id);
     setStarted(false);
   };
+  const run = () => { setStarted(true); if (rid) markLabRun(rid); };
   const restart = () => {
     setRunKey((k) => k + 1);
     setStarted(true);
+    if (rid) markLabRun(rid);
   };
 
   return (
@@ -172,7 +175,7 @@ export function StudentLab({ onAdvanced }: { onAdvanced: () => void }) {
               <div className="ready-arrow"><span>{reaction.c || 'шартсыз'}</span><b>⟶</b></div>
               <div className="product-question"><span>?</span><small>Қандай өнім<br />түзіледі?</small></div>
             </div>
-            <button className="run-reaction" onClick={() => setStarted(true)}><Icon n="flask" size={22} />Реакцияны жүргізу<span>→</span></button>
+            <button className="run-reaction" onClick={run}><Icon n="flask" size={22} />Реакцияны жүргізу<span>→</span></button>
             <p className="run-hint">Батырманы басқанда атомдардың қозғалысы басталады</p>
           </div>
         )}

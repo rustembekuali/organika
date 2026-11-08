@@ -7,6 +7,7 @@ import { Home, Library, TopicPage, NamedList, NamedPage, School, SchoolPage, Pra
 import type { Mode } from './lib/quiz';
 import { Lab } from './pages/Lab';
 import { NamesPage } from './pages/Names';
+import { GuidePage } from './pages/Guide';
 
 // Негізгі мәзір — 5 бөлім (телефонда төменгі панель)
 const NAV: [string, string, string][] = [
@@ -20,10 +21,13 @@ function route(h: string) {
   if (h.startsWith('r-')) return <ReactionPage id={h.slice(2)} />;
   if (h === 'metro') return <MetroPage />;
   if (h === 'lab') return <Lab />;
+  if (h.startsWith('lab-')) return <Lab key={h} base={h.slice(4)} />;
   if (h === 'practice') return <Practice />;
   if (h.startsWith('p-')) return <PracticeMode mode={h.slice(2) as Mode | 'review'} />;
   if (h === 'named') return <NamedList />;
-  if (h === 'names') return <NamesPage />;
+  if (h === 'names') return <NamesPage key={h} />;
+  if (h.startsWith('names-')) return <NamesPage key={h} part={h.slice(6)} />;
+  if (h === 'guide') return <GuidePage />;
   if (h.startsWith('n-')) return <NamedPage id={h.slice(2)} />;
   if (h === 'school') return <School />;
   if (h.startsWith('s-')) return <SchoolPage id={h.slice(2)} />;
@@ -37,6 +41,8 @@ function section(h: string) {
   if (!h || h === 'home') return '';
   if (/^(t-|r-|z-|s-|n-)/.test(h) || ['lib', 'school', 'named', 'names', 'sources'].includes(h)) return 'lib';
   if (h.startsWith('p-')) return 'practice';
+  if (h.startsWith('lab')) return 'lab';
+  if (h.startsWith('names') || h === 'guide') return 'lib';
   return h;
 }
 

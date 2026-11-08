@@ -335,10 +335,10 @@ function CustomFilm({ r }: { r: CustomReaction }) {
   );
 }
 
-export function Lab() {
+export function Lab({ base }: { base?: string } = {}) {
   const [advanced, setAdvanced] = useState(false);
   const [tab, setTab] = useState<'constructor' | 'run' | 'edit'>('constructor');
-  if (!advanced) return <div className="page lab"><StudentLab onAdvanced={() => setAdvanced(true)} /></div>;
+  if (!advanced) return <div className="page lab"><StudentLab key={base} initialBase={base} onAdvanced={() => setAdvanced(true)} /></div>;
   return (
     <div className="page lab">
       <button className="lab-back" onClick={() => setAdvanced(false)}>← Оқу режиміне оралу</button>

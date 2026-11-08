@@ -16,6 +16,10 @@ export interface Progress {
   formula: 'sf' | 'hill';
   /** Пайдаланушы қолмен қосқан реакциялар (тексерілмеген) */
   custom: CustomReaction[];
+  /** Атау жаттығуы: бөлім бойынша ең жақсы нәтиже (10-нан), раундтар саны, дұрыс табылған атаулар */
+  names?: { best: Record<string, number>; rounds: number; learned: string[] };
+  /** Оқу зертханасында жүргізілген реакциялар */
+  labRuns?: string[];
 }
 
 export interface CustomReaction {
@@ -88,6 +92,13 @@ export function importCode(input: string): boolean {
       p.results = res;
       p.history = [...(data.history ?? []), ...p.history].sort((a, b) => b.ts - a.ts).slice(0, 80);
       p.review = [...new Set([...(data.review ?? []), ...p.review])].slice(0, 200);
+      if (data.names) {
+        const n = p.names ?? { best: {}, rounds: 0, learned: [] };
+        const best = { ...n.best };
+        for (const [k, v] of Object.entries(data.names.best ?? {})) best[k] = Math.max(best[k] ?? 0, v);
+        p.names = { best, rounds: Math.max(n.rounds, data.names.rounds ?? 0), learned: [...new Set([...n.learned, ...(data.names.learned ?? [])])] };
+      }
+      p.labRuns = [...new Set([...(p.labRuns ?? []), ...(data.labRuns ?? [])])];
       const ids = new Set(p.custom.map((c) => c.id));
       p.custom = [...p.custom, ...(data.custom ?? []).filter((c) => !ids.has(c.id))];
     });
@@ -138,6 +149,19 @@ export function recordAnswer(mode: string, key: string, ok: boolean) {
     if (!ok && !p.review.includes(key)) p.review = [key, ...p.review].slice(0, 200);
     if (ok && p.review.includes(key)) p.review = p.review.filter((k) => k !== key);
   });
+}
+
+export function recordNamesRound(part: string, score: number, learned: string[]) {
+  update((p) => {
+    const n = (p.names ??= { best: {}, rounds: 0, learned: [] });
+    n.rounds++;
+    n.best[part] = Math.max(n.best[part] ?? 0, score);
+    n.learned = [...new Set([...n.learned, ...learned])];
+  });
+}
+
+export function markLabRun(rid: string) {
+  update((p) => { if (!(p.labRuns ?? []).includes(rid)) p.labRuns = [...(p.labRuns ?? []), rid]; });
 }
 
 export function resetProgress() {
