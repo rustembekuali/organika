@@ -1229,3 +1229,4 @@ select, input[type=number], input[type=search], .name-in { border-radius: 2px; }
 .author-link svg { width: 17px; height: 17px; flex: none; color: var(--accent); }
 .author-link:hover { border-color: var(--accent); }
 .author-link:active { transform: scale(.96); }
+.af-hl { color: var(--accent); font-weight: 800; letter-spacing: .01em; }

@@ -630,9 +630,9 @@ export function ProgressPage() {
 }
 
 /** Жоба авторы — профиль бетінің соңында (CHEMLAB-тағыдай). Фото: src/assets/author.jpg */
-const AUTHOR_FACTS: [string, string | null, string][] = [
-  ['🎓', null, 'Juz40 education-ның 2025 жылғы түлегі'],
-  ['🧪', null, 'БИОХИМ комбинациясы бойынша'],
+const AUTHOR_FACTS: [string, string | null, React.ReactNode][] = [
+  ['🎓', 'Түлек', <><b className="af-hl">JUZ40 EDUCATION</b>-ның 2025 жылғы <b className="af-hl">БИОХИМ</b> комбинациясы бойынша түлегі</>],
+  ['🧪', 'Куратор', <><b className="af-hl">SMART ХИМ-21</b> поток кураторы</>],
   ['🏛️', 'Оқу орны', 'Астана қ., Т. Шарманов атындағы Қазақ ұлттық медицина университетінің студенті'],
   ['📚', 'Мамандық', 'Стоматология'],
 ];
@@ -646,7 +646,7 @@ function AuthorCard() {
         <strong className="author-name">Рустембек Уали Муратұлы</strong>
         <ul className="author-facts">
           {AUTHOR_FACTS.map(([ic, label, text]) => (
-            <li key={text}><span className="af-ic" aria-hidden>{ic}</span><div className="af-body">{label && <span className="af-label">{label}</span>}<span className="af-text">{text}</span></div></li>
+            <li key={ic}><span className="af-ic" aria-hidden>{ic}</span><div className="af-body">{label && <span className="af-label">{label}</span>}<span className="af-text">{text}</span></div></li>
           ))}
         </ul>
         <div className="author-sep" />
