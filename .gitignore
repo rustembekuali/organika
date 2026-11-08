@@ -5,3 +5,4 @@ scripts/_ids.mjs
 scripts/__pycache__/
 *.log
 .DS_Store
+.wrangler
