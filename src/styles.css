@@ -1124,7 +1124,6 @@ select, input[type=number], input[type=search], .name-in { border-radius: 2px; }
 
 /* Органикалық курсор */
 .organic-cursor { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 60; pointer-events: none; }
-@media (hover: none), (pointer: coarse) { .organic-cursor { display: none; } }
 [data-motion='reduce'] .organic-cursor { display: none; }
 
 @media (max-width: 900px) {
