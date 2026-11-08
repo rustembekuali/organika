@@ -97,7 +97,7 @@ export default function App() {
         {NAV.map(([to, l, ic]) => <A key={to} to={to} className={sec === to ? 'on' : ''}><Icon n={ic} size={22} /><span>{l}</span></A>)}
       </nav>
       <footer className="foot">
-        <div>Органика · қазақ тіліндегі органикалық химия реакцияларының оқу базасы</div>
+        <div>Органика · қазақ тіліндегі органикалық химия реакцияларының оқу базасы · Авторы: <b>Уали Рустембек</b></div>
         <div><A to="sources">Дереккөздер және тексеру журналы</A> · <kbd>/</kbd> — іздеу</div>
       </footer>
     </>

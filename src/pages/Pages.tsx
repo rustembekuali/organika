@@ -20,6 +20,7 @@ import { OrganicCursor } from '../components/OrganicCursor';
 import { Contours } from '../components/Contours';
 import { ALL_NAMES } from '../data/names';
 import { guideSteps } from './Guide';
+import authorPhoto from '../assets/author.jpg';
 
 const usableCount = REACTIONS.filter(usable).length;
 
@@ -623,7 +624,45 @@ export function ProgressPage() {
         {favs.length ? <div className="rlist">{favs.map((r) => <ReactionRow key={r.id} r={r} />)}</div> : <p className="muted">Реакция бетіндегі «Сақтау» батырмасымен қос.</p>}
       </section>
       <ResetButton />
+      <AuthorCard />
     </div>
+  );
+}
+
+/** Жоба авторы — профиль бетінің соңында (CHEMLAB-тағыдай). Фото: src/assets/author.jpg */
+const AUTHOR_FACTS: [string, string | null, string][] = [
+  ['🎓', null, 'Juz40 education-ның 2025 жылғы түлегі'],
+  ['🧪', null, 'БИОХИМ комбинациясы бойынша'],
+  ['🏛️', 'Оқу орны', 'Астана қ., Т. Шарманов атындағы Қазақ ұлттық медицина университетінің студенті'],
+  ['📚', 'Мамандық', 'Стоматология'],
+];
+function AuthorCard() {
+  return (
+    <section className="author-sect" aria-labelledby="author-h">
+      <h2 id="author-h" className="h-card">Жоба авторы</h2>
+      <div className="card author-card">
+        <div className="author-photo-wrap"><img className="author-photo" src={authorPhoto} width={600} height={900} loading="lazy" decoding="async" alt="Рустембек Уали Муратұлы" /></div>
+        <div className="author-eyebrow">ОРГАНИКА · ОРГАНИКАЛЫҚ ХИМИЯ ПЛАТФОРМАСЫ</div>
+        <strong className="author-name">Рустембек Уали Муратұлы</strong>
+        <ul className="author-facts">
+          {AUTHOR_FACTS.map(([ic, label, text]) => (
+            <li key={text}><span className="af-ic" aria-hidden>{ic}</span><div className="af-body">{label && <span className="af-label">{label}</span>}<span className="af-text">{text}</span></div></li>
+          ))}
+        </ul>
+        <div className="author-sep" />
+        <p className="author-contact-h">Сұрақтарың болса:</p>
+        <div className="author-links">
+          <a className="author-link" href="https://instagram.com/ualirustembek" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none" /></svg>
+            <span>@ualirustembek</span>
+          </a>
+          <a className="author-link" href="https://wa.me/77773446005" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.3.5c-.1.2-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.4-.1.6-.1l1.8.9c.2.1.4.2.4.3.1.2.1.9-.1 1.5Z" /></svg>
+            <span>87773446005</span>
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
 
