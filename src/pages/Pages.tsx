@@ -19,6 +19,7 @@ import { STATION_IDS, metroIntent } from '../lib/graph';
 import { OrganicCursor } from '../components/OrganicCursor';
 import { Contours } from '../components/Contours';
 import { ALL_NAMES } from '../data/names';
+import { ALL_CARDS, DECKS } from '../data/cards';
 import { guideSteps } from './Guide';
 import authorPhoto from '../assets/author.jpg';
 
@@ -53,7 +54,7 @@ export function Home() {
         <Contours />
         <div className="hero-grid">
           <div className="hero-main">
-            <div className="hero-id">органика_lab / оқу платформасы</div>
+            <div className="hero-id">органика · органикалық химияны үйрену сайты</div>
             <h1 className="hero-title">{prog.name ? <>Сәлем, {prog.name}</> : <>Органикалық реакцияларды <span className="hl">көріп, түсініп</span> үйрен</>}</h1>
             <ul className="hero-meta">
               <li><Icon n="flask" size={18} /> Атомдар қозғалатын анимациялар</li>
@@ -527,6 +528,11 @@ export function Practice() {
             </A>
           );
         })}
+        <A to="cards" className="mode-card review">
+          <span className="mc-t">Флэш-карталар</span>
+          <span className="mc-d">Атаулар, функционалдық топтар, сапалық және атаулы реакциялар: картаны аудар да, өзіңді тексер.</span>
+          <span className="mc-s muted small">{ALL_CARDS.length} карта · {DECKS.length} колода</span>
+        </A>
         <A to="names" className="mode-card">
           <span className="mc-t">Атауын тап</span>
           <span className="mc-d">Формула бойынша атауды немесе атау бойынша формуланы тап: көмірсутектер, оттекті және азотты қосылыстар.</span>

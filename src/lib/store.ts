@@ -20,6 +20,10 @@ export interface Progress {
   names?: { best: Record<string, number>; rounds: number; learned: string[] };
   /** Оқу зертханасында жүргізілген реакциялар */
   labRuns?: string[];
+  /** Таныстыру нұсқаулығы көрсетілді ме */
+  onboarded?: boolean;
+  /** Флэш-карталар: карта id → Лейтнер қорабы (0 — білмейді, 3 — толық меңгерді) және соңғы қаралған уақыт */
+  cards?: Record<string, { box: number; ts: number }>;
 }
 
 export interface CustomReaction {
@@ -99,6 +103,11 @@ export function importCode(input: string): boolean {
         p.names = { best, rounds: Math.max(n.rounds, data.names.rounds ?? 0), learned: [...new Set([...n.learned, ...(data.names.learned ?? [])])] };
       }
       p.labRuns = [...new Set([...(p.labRuns ?? []), ...(data.labRuns ?? [])])];
+      if (data.cards) {
+        const c = { ...(p.cards ?? {}) };
+        for (const [k, v] of Object.entries(data.cards)) if (!c[k] || c[k].ts < v.ts) c[k] = v;
+        p.cards = c;
+      }
       const ids = new Set(p.custom.map((c) => c.id));
       p.custom = [...p.custom, ...(data.custom ?? []).filter((c) => !ids.has(c.id))];
     });
@@ -164,8 +173,16 @@ export function markLabRun(rid: string) {
   update((p) => { if (!(p.labRuns ?? []).includes(rid)) p.labRuns = [...(p.labRuns ?? []), rid]; });
 }
 
+export function rateCard(id: string, known: boolean) {
+  update((p) => {
+    const c = (p.cards ??= {});
+    const cur = c[id]?.box ?? 0;
+    c[id] = { box: known ? Math.min(3, cur + 1) : 0, ts: Date.now() };
+  });
+}
+
 export function resetProgress() {
-  const keep = { theme: state.theme, motion: state.motion, formula: state.formula, custom: state.custom, name: state.name };
+  const keep = { theme: state.theme, motion: state.motion, formula: state.formula, custom: state.custom, name: state.name, onboarded: state.onboarded };
   state = { ...empty(), ...keep };
   save();
   listeners.forEach((l) => l());
