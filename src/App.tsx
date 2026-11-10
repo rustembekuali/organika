@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useHash, A, Icon, subFromHash } from './components/ui';
+import { useHash, A, Icon, subFromHash, BackButton } from './components/ui';
 import { useProgress, update } from './lib/store';
 import { ReactionPage } from './components/Reaction';
 import { MetroPage } from './pages/Metro';
@@ -8,6 +8,8 @@ import type { Mode } from './lib/quiz';
 import { Lab } from './pages/Lab';
 import { NamesPage } from './pages/Names';
 import { GuidePage } from './pages/Guide';
+import { CardsPage } from './pages/Cards';
+import { Onboarding, reopenOnboarding } from './components/Onboarding';
 
 // Негізгі мәзір — 5 бөлім (телефонда төменгі панель)
 const NAV: [string, string, string][] = [
@@ -28,6 +30,8 @@ function route(h: string) {
   if (h === 'names') return <NamesPage key={h} />;
   if (h.startsWith('names-')) return <NamesPage key={h} part={h.slice(6)} />;
   if (h === 'guide') return <GuidePage />;
+  if (h === 'cards') return <CardsPage key={h} />;
+  if (h.startsWith('cards-')) return <CardsPage key={h} deck={h.slice(6)} />;
   if (h.startsWith('n-')) return <NamedPage id={h.slice(2)} />;
   if (h === 'school') return <School />;
   if (h.startsWith('s-')) return <SchoolPage id={h.slice(2)} />;
@@ -40,7 +44,7 @@ function route(h: string) {
 function section(h: string) {
   if (!h || h === 'home') return '';
   if (/^(t-|r-|z-|s-|n-)/.test(h) || ['lib', 'school', 'named', 'names', 'sources'].includes(h)) return 'lib';
-  if (h.startsWith('p-')) return 'practice';
+  if (h.startsWith('p-') || h.startsWith('cards')) return 'practice';
   if (h.startsWith('lab')) return 'lab';
   if (h.startsWith('names') || h === 'guide') return 'lib';
   return h;
@@ -73,7 +77,7 @@ export default function App() {
         <div className="top-in">
           <A to="" className="logo" title="Органика — басты бет">
             <svg width="30" height="30" viewBox="0 0 28 28" aria-hidden><polygon points="14,2 25,8.5 25,19.5 14,26 3,19.5 3,8.5" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="14" cy="14" r="4.2" fill="var(--accent)" /></svg>
-            <span>Органика <small className="logo-lab">LAB</small></span>
+            <span>Органика</span>
           </A>
           <nav className="nav" aria-label="Негізгі мәзір">
             {NAV.map(([to, l, ic]) => <A key={to} to={to} className={sec === to ? 'on' : ''}><Icon n={ic} size={20} /><span>{l}</span></A>)}
@@ -92,13 +96,14 @@ export default function App() {
           </div>
         </div>
       </header>
-      <main id="main" tabIndex={-1}>{route(h)}</main>
+      <main id="main" tabIndex={-1}>{h && h !== 'home' && <BackButton />}{route(h)}</main>
       <nav className="bottom-nav" aria-label="Негізгі мәзір (төменгі)">
         {NAV.map(([to, l, ic]) => <A key={to} to={to} className={sec === to ? 'on' : ''}><Icon n={ic} size={22} /><span>{l}</span></A>)}
       </nav>
+      <Onboarding />
       <footer className="foot">
         <div>Органика · қазақ тіліндегі органикалық химия реакцияларының оқу базасы · Авторы: <b>Уали Рустембек</b></div>
-        <div><A to="sources">Дереккөздер және тексеру журналы</A> · <kbd>/</kbd> — іздеу</div>
+        <div><button className="linkish" onClick={reopenOnboarding}>Сайт туралы нұсқаулық</button> · <A to="sources">Дереккөздер және тексеру журналы</A> · <kbd>/</kbd> — іздеу</div>
       </footer>
     </>
   );

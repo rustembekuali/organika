@@ -3,10 +3,44 @@ import { CLASS_INFO, LEVEL_NAMES, STATUS_NAMES, TYPE_NAMES } from '../data/topic
 import type { ClassId, Reaction } from '../data/types';
 
 // ───── Маршрутизация (тек #атау түріндегі хэштер)
+// Сайт ішіндегі жүріс тарихы: «Артқа» түймесі алдыңғы бетке қайтару үшін
+const trail: string[] = [typeof location !== 'undefined' ? location.hash.slice(1) : ''];
+function track(h: string) {
+  if (trail.length > 1 && trail[trail.length - 2] === h) trail.pop();
+  else if (trail[trail.length - 1] !== h) trail.push(h);
+}
+
+/** Бөлімнің негізгі беті: сайтқа сілтемемен тікелей кірсе, «Артқа» осында апарады */
+export function parentOf(h: string): string {
+  if (/^(t-|r-|z-)/.test(h)) return 'lib';
+  if (h.startsWith('s-')) return 'school';
+  if (h.startsWith('n-')) return 'named';
+  if (h.startsWith('p-')) return 'practice';
+  if (h.startsWith('names-')) return 'names';
+  if (h.startsWith('lab-')) return 'lab';
+  if (h.startsWith('cards-')) return 'cards';
+  return '';
+}
+
+export function goBack() {
+  const h = location.hash.slice(1);
+  if (trail.length > 1) history.back();
+  else location.hash = parentOf(h);
+}
+
+export function BackButton() {
+  return (
+    <button className="back-btn" onClick={goBack} aria-label="Артқа, алдыңғы бетке">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.8" /></svg>
+      Артқа
+    </button>
+  );
+}
+
 export function useHash(): string {
   const [h, setH] = useState(() => location.hash.slice(1));
   useEffect(() => {
-    const on = () => { setH(location.hash.slice(1)); window.scrollTo({ top: 0 }); };
+    const on = () => { const nh = location.hash.slice(1); track(nh); setH(nh); window.scrollTo({ top: 0 }); };
     window.addEventListener('hashchange', on);
     return () => window.removeEventListener('hashchange', on);
   }, []);
@@ -60,6 +94,7 @@ const P: Record<string, string> = {
   target: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
   flask: 'M9 2h6v2h-1v5.3l5.6 9.4A2 2 0 0 1 17.9 22H6.1a2 2 0 0 1-1.7-3.3L10 9.3V4H9z',
   home: 'M12 3 2 12h3v8h6v-6h2v6h6v-8h3z',
+  cards: 'M8 2h11a2 2 0 0 1 2 2v13h-2V4H8zM3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm2 0v12h10V8zm2 3h6v2H7zm0 4h4v2H7z',
   user: 'M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z',
   filter: 'M3 5h18l-7 8v6l-4 2v-8z',
   download: 'M11 3h2v10l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4L11 13zM5 19h14v2H5z',

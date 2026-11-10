@@ -123,7 +123,7 @@ export function ConstructorLab() {
   return (
     <section className="constructor" aria-label="2D және 3D молекула конструкторы">
       <div className="constructor-heading">
-        <div><span className="studio-label">ORGANIKA STUDIO</span><h2>Молекула конструкторы</h2><p>Атомдарды қой, байланыстарды сал — реакцияңды 2D және 3D форматта көр.</p></div>
+        <div><span className="studio-label">ОРГАНИКА · КОНСТРУКТОР</span><h2>Молекула конструкторы</h2><p>Атомдарды қой, байланыстарды сал — реакцияңды 2D және 3D форматта көр.</p></div>
         <div className="constructor-heading-actions">
           <div className="view-switch" role="group" aria-label="Көрініс режимі">
             <button className={mode === '2d' ? 'on' : ''} aria-pressed={mode === '2d'} onClick={() => setMode('2d')}>2D сызба</button>
