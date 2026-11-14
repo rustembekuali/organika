@@ -1,49 +1,117 @@
-"""Скелет қырларын қалам жүрісі ретімен тізіп, тегіс SVG жолдарына айналдыру."""
+"""Скелет қырларын қалам жүрісіне автоматты жалғап, тегіс SVG жолдарына айналдыру.
+
+Қолдану (signature.png тұрған бумада):
+    python3 trace.py signature.png   # skel.npy, debug.png
+    python3 edges.py                 # graph.json, edges.png
+    python3 build.py                 # signature.json, check.png
+    cp signature.json ../../src/data/generated/signature.json
+
+Қырларды қолмен тізудің қажеті жоқ: әр түйінде қалам ең түзу жалғасатын (бұрылысы ең аз)
+қырмен жүреді, бұрылыс тым күрт болса — штрих аяқталады. Штрихтар солдан оңға қарай салынады.
+"""
 import json, math
 import numpy as np
 from PIL import Image, ImageDraw
 
 g = json.load(open('graph.json'))
 E = g['edges']
+cent = {int(k): v for k, v in g['cent'].items()}
+MAX_TURN = math.radians(75)   # бұдан күрт бұрылыс — жаңа штрих
 
-def chain(start, ids):
-    """start түйінінен бастап қырларды ретімен жалғау (бағыты автоматты)."""
-    cur, out = start, []
-    for i in ids:
-        e = E[i]
-        pts = e['pts']
-        if e['a'] == e['b']:
-            pass  # тұйық ілмек: бағыты кейін тексеріледі
-        elif e['a'] == cur:
-            cur = e['b']
-        elif e['b'] == cur:
-            pts = pts[::-1]; cur = e['a']
-        else:
-            raise SystemExit('edge e%d does not touch n%d' % (i, cur))
-        out += pts if not out else pts[1:]
-    return out
+adj = {}
+for i, e in enumerate(E):
+    adj.setdefault(e['a'], []).append(i)
+    if e['b'] != e['a']:
+        adj.setdefault(e['b'], []).append(i)
 
-def loop_dir(pts, want_down):
-    k = min(40, len(pts) // 4)
-    down = pts[k][1] > pts[0][1]
-    return pts if down == want_down else pts[::-1]
+def oriented(i, frm):
+    """i қырының нүктелері frm түйінінен басталатындай бағытта."""
+    e = E[i]
+    pts = e['pts']
+    if e['a'] == frm:
+        return pts, e['b']
+    return pts[::-1], e['a']
 
-# 1) Р әрпі + астынан өтетін ұзын сызық (бір тыныспен)
-s1 = chain(19, [16, 24, 25, 30, 23, 15])
-s1 += loop_dir(E[26]['pts'], True)[1:]
-s1 += chain(35, [15, 33, 8, 7, 17, 37, 36, 38, 6, 27])[1:]
-# 2–3) у
-s2 = chain(26, [14, 8, 7, 22])
-s3 = chain(24, [22, 7, 9])
-# 4–6) с, т
-s4 = chain(18, [10, 5])
-s5 = chain(8, [5, 35])
-s6 = chain(12, [3, 13])
-# 7) е
-s7 = chain(17, [1, 19]) + loop_dir(E[4]['pts'], False)[1:] + chain(10, [19, 0])[1:]
-# 8) м
-s8 = chain(22, [32, 31, 31, 39, 34, 2, 2, 20, 18, 18, 11])
-strokes = [s1, s2, s3, s4, s5, s6, s7, s8]
+def direction(pts, at_start, k=12):
+    """Қырдың басындағы (немесе соңындағы) бағыт векторы."""
+    p = np.array(pts, float)
+    k = min(k, len(p) - 1)
+    if k <= 0:
+        return np.zeros(2)
+    v = p[k] - p[0] if at_start else p[-1] - p[-1 - k]
+    n = np.hypot(*v)
+    return v / n if n else v
+
+def turn(v1, v2):
+    if not v1.any() or not v2.any():
+        return 0.0
+    return math.acos(max(-1.0, min(1.0, float(v1 @ v2))))
+
+used = set()
+def free(n):
+    return [i for i in adj.get(n, []) if i not in used]
+
+def walk(start):
+    pts, node, inc = [], start, None
+    while True:
+        cand = free(node)
+        if not cand:
+            break
+        best, bt = None, None
+        for i in cand:
+            p, _ = oriented(i, node)
+            t = turn(inc, direction(p, True)) if inc is not None else 0.0
+            if bt is None or t < bt:
+                best, bt = i, t
+        if inc is not None and bt > MAX_TURN:
+            break
+        p, nxt = oriented(best, node)
+        used.add(best)
+        pts += p if not pts else p[1:]
+        inc = direction(p, False)
+        node = nxt
+    return pts
+
+strokes = []
+while len(used) < len(E):
+    # бос ұшы бар түйіндерден (сол жақтағысынан) бастаймыз, болмаса — кез келген қалған қырдан
+    ends = [n for n in adj if len(free(n)) == 1]
+    nodes = ends or [n for n in adj if free(n)]
+    start = min(nodes, key=lambda n: cent[n][0])
+    s = walk(start)
+    if len(s) >= 2:
+        strokes.append(s)
+
+# өте қысқа қалдықтарды (түйін ішіндегі ұсақ қырлар) тастаймыз
+def plen(s):
+    a = np.array(s, float)
+    return float(np.hypot(*np.diff(a, axis=0).T).sum())
+strokes = [s for s in strokes if plen(s) > 14]
+# әр штрих сол жақ ұшынан басталсын, штрихтар солдан оңға салынсын
+strokes = [s if s[0][0] <= s[-1][0] else s[::-1] for s in strokes]
+# алдымен әріптер (солдан оңға), ең соңында ұзын әшекейлі сызықтар — қолмен жазғандағыдай
+allx = np.array([p[0] for s in strokes for p in s])
+W_ALL = allx.max() - allx.min()
+def width(s):
+    xs = [p[0] for p in s]
+    return max(xs) - min(xs)
+ally = np.array([p[1] for s in strokes for p in s])
+LOW = ally.min() + 0.75 * (ally.max() - ally.min())   # бұдан төмен басталатын штрих — асты сызған әшекей
+flourish = lambda s: width(s) > 0.33 * W_ALL or min(p[1] for p in s) > LOW
+letters = sorted([s for s in strokes if not flourish(s)], key=lambda s: s[0][0])
+rest = [s for s in strokes if flourish(s)]
+# әшекейлер: сол жақтағысынан бастап, келесісі — алдыңғысының соңына ең жақын ұшы бар штрих (қажет болса кері бағытта)
+tail = []
+if rest:
+    cur = min(rest, key=lambda s: s[0][0]); rest.remove(cur); tail.append(cur)
+    while rest:
+        end = np.array(tail[-1][-1])
+        best = min(rest, key=lambda s: min(np.hypot(*(np.array(s[0]) - end)), np.hypot(*(np.array(s[-1]) - end))))
+        rest.remove(best)
+        if np.hypot(*(np.array(best[-1]) - end)) < np.hypot(*(np.array(best[0]) - end)):
+            best = best[::-1]
+        tail.append(best)
+strokes = letters + tail
 
 def smooth(pts, it=3, win=9):
     a = np.array(pts, float)
@@ -58,18 +126,6 @@ def smooth(pts, it=3, win=9):
         a = b
     return a
 
-def rdp(a, eps):
-    if len(a) < 3:
-        return a
-    s, e = a[0], a[-1]
-    d = e - s
-    n = np.hypot(*d)
-    dist = np.abs(d[0] * (a[:, 1] - s[1]) - d[1] * (a[:, 0] - s[0])) / n if n else np.hypot(*(a - s).T)
-    i = int(dist.argmax())
-    if dist[i] > eps:
-        return np.vstack([rdp(a[:i + 1], eps)[:-1], rdp(a[i:], eps)])
-    return np.array([s, e])
-
 def to_path(a):
     """Catmull-Rom → кубтық Безье."""
     f = lambda v: ('%.1f' % v).rstrip('0').rstrip('.')
@@ -81,11 +137,15 @@ def to_path(a):
         d += 'C%s %s %s %s %s %s' % tuple(f(v) for v in (*c1, *c2, *p2))
     return d
 
-X0, Y0, X1, Y1 = 140, 14, 1132, 412   # қиып алу аймағы
 def resample(a, step=6.0):
     seg = np.hypot(*np.diff(a, axis=0).T); t = np.concatenate([[0], np.cumsum(seg)])
     n = max(3, int(round(t[-1] / step)) + 1); u = np.linspace(0, t[-1], n)
     return np.stack([np.interp(u, t, a[:, 0]), np.interp(u, t, a[:, 1])], 1)
+
+allp = np.vstack([np.array(s, float) for s in strokes])
+M = 14
+X0, Y0 = np.floor(allp.min(0)) - M
+X1, Y1 = np.ceil(allp.max(0)) + M
 out = []
 for s in strokes:
     a = smooth(s, it=4, win=9)
@@ -94,16 +154,16 @@ for s in strokes:
     seg = np.hypot(*np.diff(a, axis=0).T).sum()
     out.append({'d': to_path(a), 'len': round(float(seg), 1), 'poly': a.tolist()})
     print(len(s), '->', len(a), 'pts, len', round(float(seg)))
-json.dump({'w': X1 - X0, 'h': Y1 - Y0, 'strokes': [{'d': o['d'], 'len': o['len']} for o in out]}, open('signature.json', 'w'))
-print('bytes', sum(len(o['d']) for o in out))
+json.dump({'w': int(X1 - X0), 'h': int(Y1 - Y0), 'strokes': [{'d': o['d'], 'len': o['len']} for o in out]}, open('signature.json', 'w'))
+print('strokes', len(out), 'bytes', sum(len(o['d']) for o in out), 'box', int(X1 - X0), 'x', int(Y1 - Y0))
 
-# салыстыру: түпнұсқа үстіне қызылмен
+# салыстыру: түпнұсқа үстіне түрлі түспен, штрих нөмірімен
 im = Image.open('signature.png').convert('RGB')
 im = Image.blend(im, Image.new('RGB', im.size, 'white'), 0.55)
 d = ImageDraw.Draw(im)
 cols = [(230, 25, 75), (0, 130, 200), (60, 180, 75), (245, 130, 48), (145, 30, 180), (0, 160, 160), (240, 50, 230), (120, 90, 0)]
 for i, o in enumerate(out):
     p = [(x + X0, y + Y0) for x, y in o['poly']]
-    d.line(p, fill=cols[i], width=3)
-    d.text((p[0][0] + 5, p[0][1] - 14), str(i + 1), fill=cols[i])
+    d.line(p, fill=cols[i % len(cols)], width=3)
+    d.text((p[0][0] + 5, p[0][1] - 14), str(i + 1), fill=cols[i % len(cols)])
 im.save('check.png')
