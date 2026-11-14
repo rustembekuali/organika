@@ -161,12 +161,11 @@ export function Signature({ className = '', label = 'Уали Рустембек
 
 /**
  * Сайтқа кіргендегі интро: қараңғы экранда қолтаңба жазылады, кейін сайт ашылады.
- * Браузер сессиясында бір рет көрсетіледі; басу, Esc немесе «Өткізу» арқылы өткізуге болады.
+ * Бетті ашқан немесе жаңартқан сайын көрсетіледі (сайт ішінде беттер арасында жүргенде қайталанбайды);
+ * басу, Esc немесе «Өткізу» арқылы өткізуге болады. «Қозғалысты азайту» қосулы болса көрсетілмейді.
  */
-const INTRO_KEY = 'organika-intro';
 export function introPending(): boolean {
   try {
-    if (sessionStorage.getItem(INTRO_KEY)) return false;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
     const st = JSON.parse(localStorage.getItem('organika-v1') || '{}');
     return st.motion !== 'reduce';
@@ -179,7 +178,6 @@ export function Intro({ onEnd }: { onEnd: () => void }) {
   const close = useCallback((delay: number) => {
     if (ended.current) return;
     ended.current = true;
-    try { sessionStorage.setItem(INTRO_KEY, '1'); } catch { /* жеке режим */ }
     timers.current.push(window.setTimeout(() => {
       box.current?.classList.add('out');
       timers.current.push(window.setTimeout(onEnd, 900));
