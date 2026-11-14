@@ -22,6 +22,7 @@ import { ALL_NAMES } from '../data/names';
 import { ALL_CARDS, DECKS } from '../data/cards';
 import { guideSteps } from './Guide';
 import authorPhoto from '../assets/author.jpg';
+import { Signature } from '../components/Signature';
 
 const usableCount = REACTIONS.filter(usable).length;
 
@@ -655,6 +656,7 @@ function AuthorCard() {
             <li key={ic}><span className="af-ic" aria-hidden>{ic}</span><div className="af-body">{label && <span className="af-label">{label}</span>}<span className="af-text">{text}</span></div></li>
           ))}
         </ul>
+        <div className="sig-stage"><Signature /><span className="sig-cap">Қолтаңба · қайта жазу үшін бас</span></div>
         <div className="author-sep" />
         <p className="author-contact-h">Сұрақтарың болса:</p>
         <div className="author-links">
