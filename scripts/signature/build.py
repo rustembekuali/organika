@@ -82,10 +82,15 @@ def to_path(a):
     return d
 
 X0, Y0, X1, Y1 = 140, 14, 1132, 412   # қиып алу аймағы
+def resample(a, step=6.0):
+    seg = np.hypot(*np.diff(a, axis=0).T); t = np.concatenate([[0], np.cumsum(seg)])
+    n = max(3, int(round(t[-1] / step)) + 1); u = np.linspace(0, t[-1], n)
+    return np.stack([np.interp(u, t, a[:, 0]), np.interp(u, t, a[:, 1])], 1)
 out = []
 for s in strokes:
-    a = smooth(s)
-    a = rdp(a, 0.9) - np.array([X0, Y0])
+    a = smooth(s, it=4, win=9)
+    a = smooth(resample(a, 3.0), it=2, win=5)
+    a = resample(a, 6.0) - np.array([X0, Y0])
     seg = np.hypot(*np.diff(a, axis=0).T).sum()
     out.append({'d': to_path(a), 'len': round(float(seg), 1), 'poly': a.tolist()})
     print(len(s), '->', len(a), 'pts, len', round(float(seg)))
