@@ -68,11 +68,22 @@ def walk(start):
         p, nxt = oriented(best, node)
         used.add(best)
         pts += p if not pts else p[1:]
-        inc = direction(p, False)
+        inc = direction(pts, False)   # бағыт жүрілген жолдың соңғы бөлігінен (қысқа түйін қырлары адастырмасын)
         node = nxt
     return pts
 
+# Қалам алдымен осы нүктелерден (сурет координаталарында) бастап, берілген ретпен жүреді; бұл штрихтардың бағыты сақталады.
+# Бұл қолтаңбада: 1) «Р»-дың ішкі ілмегінің ұшы → ілмек; 2) «Р»-дың аяғы: таяқшаның басынан төмен, иіліп солға дейін.
+PEN_STARTS = [(458, 108), (435, 237)]
 strokes = []
+LEAD = []
+for hint in PEN_STARTS:
+    nodes = [n for n in adj if free(n)]
+    n0 = min(nodes, key=lambda n: math.dist(cent[n], hint))
+    st = walk(n0)
+    if len(st) >= 2:
+        LEAD.append(st)
+strokes += LEAD
 while len(used) < len(E):
     # бос ұшы бар түйіндерден (сол жақтағысынан) бастаймыз, болмаса — кез келген қалған қырдан
     ends = [n for n in adj if len(free(n)) == 1]
@@ -87,8 +98,16 @@ def plen(s):
     a = np.array(s, float)
     return float(np.hypot(*np.diff(a, axis=0).T).sum())
 strokes = [s for s in strokes if plen(s) > 14]
-# әр штрих сол жақ ұшынан басталсын, штрихтар солдан оңға салынсын
-strokes = [s if s[0][0] <= s[-1][0] else s[::-1] for s in strokes]
+# бағыт: тік штрихтар жоғарыдан төмен, қалғандары солдан оңға (бірінші штрих — қалам жүрген бағытында)
+def orient(s):
+    if any(s is l for l in LEAD):
+        return s
+    dx, dy = s[-1][0] - s[0][0], s[-1][1] - s[0][1]
+    if abs(dy) > abs(dx):
+        return s if dy > 0 else s[::-1]
+    return s if dx >= 0 else s[::-1]
+strokes = [orient(s) for s in strokes]
+lead = strokes[:len(LEAD)]
 # алдымен әріптер (солдан оңға), ең соңында ұзын әшекейлі сызықтар — қолмен жазғандағыдай
 allx = np.array([p[0] for s in strokes for p in s])
 W_ALL = allx.max() - allx.min()
@@ -98,8 +117,8 @@ def width(s):
 ally = np.array([p[1] for s in strokes for p in s])
 LOW = ally.min() + 0.75 * (ally.max() - ally.min())   # бұдан төмен басталатын штрих — асты сызған әшекей
 flourish = lambda s: width(s) > 0.33 * W_ALL or min(p[1] for p in s) > LOW
-letters = sorted([s for s in strokes if not flourish(s)], key=lambda s: s[0][0])
-rest = [s for s in strokes if flourish(s)]
+letters = lead + sorted([s for s in strokes[len(lead):] if not flourish(s)], key=lambda s: min(p[0] for p in s))
+rest = [s for s in strokes[len(lead):] if flourish(s)]
 # әшекейлер: сол жақтағысынан бастап, келесісі — алдыңғысының соңына ең жақын ұшы бар штрих (қажет болса кері бағытта)
 tail = []
 if rest:
