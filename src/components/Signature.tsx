@@ -197,7 +197,7 @@ export function Intro({ onEnd }: { onEnd: () => void }) {
       <div className="intro-aura" aria-hidden="true"><i /><i /><i /></div>
       <div className="intro-in">
         <div className="intro-burst" aria-hidden="true" />
-        <Signature speed={1.05} label="Интро: автордың қолтаңбасы" onDone={() => { box.current?.classList.add('signed'); close(1700); }} />
+        <Signature speed={1.6} label="Интро: автордың қолтаңбасы" onDone={() => { box.current?.classList.add('signed'); close(1700); }} />
         <div className="intro-word" aria-hidden="true">{'ОРГАНИКА'.split('').map((ch, i) => <span key={i} style={{ transitionDelay: i * 55 + 'ms' }}>{ch}</span>)}</div>
         <div className="intro-line" aria-hidden="true" />
       </div>
