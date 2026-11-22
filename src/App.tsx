@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useHash, A, Icon, subFromHash, BackButton } from './components/ui';
 import { useProgress, update } from './lib/store';
 import { ReactionPage } from './components/Reaction';
@@ -10,7 +10,6 @@ import { NamesPage } from './pages/Names';
 import { GuidePage } from './pages/Guide';
 import { CardsPage } from './pages/Cards';
 import { Onboarding, reopenOnboarding } from './components/Onboarding';
-import { Intro, introPending } from './components/Signature';
 
 // Негізгі мәзір — 5 бөлім (телефонда төменгі панель)
 const NAV: [string, string, string][] = [
@@ -55,7 +54,6 @@ export default function App() {
   const h = useHash();
   const prog = useProgress();
   const sec = section(h);
-  const [intro, setIntro] = useState(introPending);
   const dark = prog.theme === 'dark' || (prog.theme === 'auto' && !matchMedia('(prefers-color-scheme: light)').matches);
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
@@ -102,7 +100,7 @@ export default function App() {
       <nav className="bottom-nav" aria-label="Негізгі мәзір (төменгі)">
         {NAV.map(([to, l, ic]) => <A key={to} to={to} className={sec === to ? 'on' : ''}><Icon n={ic} size={22} /><span>{l}</span></A>)}
       </nav>
-      {intro ? <Intro onEnd={() => setIntro(false)} /> : <Onboarding />}
+      <Onboarding />
       <footer className="foot">
         <div>Органика · қазақ тіліндегі органикалық химия реакцияларының оқу базасы · Авторы: <b>Уали Рустембек</b></div>
         <div><button className="linkish" onClick={reopenOnboarding}>Сайт туралы нұсқаулық</button> · <A to="sources">Дереккөздер және тексеру журналы</A> · <kbd>/</kbd> — іздеу</div>
