@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHash, A, Icon, subFromHash, BackButton } from './components/ui';
 import { useProgress, update } from './lib/store';
 import { ReactionPage } from './components/Reaction';
@@ -10,7 +10,7 @@ import { NamesPage } from './pages/Names';
 import { GuidePage } from './pages/Guide';
 import { CardsPage } from './pages/Cards';
 import { Onboarding, reopenOnboarding } from './components/Onboarding';
-import { Snow } from './components/Snow';
+import { Snow, snowCommand } from './components/Snow';
 
 // Негізгі мәзір — 5 бөлім (телефонда төменгі панель)
 const NAV: [string, string, string][] = [
@@ -84,10 +84,7 @@ export default function App() {
             {NAV.map(([to, l, ic]) => <A key={to} to={to} className={sec === to ? 'on' : ''}><Icon n={ic} size={20} /><span>{l}</span></A>)}
           </nav>
           <div className="top-tools">
-            <button className="icon-btn" onClick={() => update((p) => { p.snow = p.snow === false; })} aria-pressed={prog.snow !== false} title={prog.snow === false ? 'Қарды қосу' : 'Қарды өшіру'}>
-              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 3.5l3 2 3-2M9 20.5l3-2 3 2M4 10.6l3.4-.2-1.5-3M20 13.4l-3.4.2 1.5 3M4 13.4l3.4.2-1.5 3M20 10.6l-3.4-.2 1.5-3" /></svg>
-              <span className="sr">{prog.snow === false ? 'Қар өшірулі, қосу' : 'Қар жауып тұр, өшіру'}</span>
-            </button>
+            <SnowMenu on={prog.snow !== false} />
             <button className="icon-btn" onClick={() => update((p) => { p.motion = p.motion === 'reduce' ? 'auto' : 'reduce'; })} aria-pressed={prog.motion === 'reduce'} title={prog.motion === 'reduce' ? 'Анимацияны қосу' : 'Қозғалысты азайту'}>
               <Icon n="motion" /><span className="sr">{prog.motion === 'reduce' ? 'Анимация азайтылған' : 'Қозғалысты азайту'}</span>
             </button>
@@ -112,5 +109,35 @@ export default function App() {
         <div><button className="linkish" onClick={reopenOnboarding}>Сайт туралы нұсқаулық</button> · <A to="sources">Дереккөздер және тексеру журналы</A> · <kbd>/</kbd> — іздеу</div>
       </footer>
     </>
+  );
+}
+
+/** Шапкадағы ❄: қар өшірулі болса қосады; қосулы болса мәзір ашады — трактор, қалың қар, өшіру */
+function SnowMenu({ on }: { on: boolean }) {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const out = (e: PointerEvent) => { if (!box.current?.contains(e.target as Node)) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    addEventListener('pointerdown', out); addEventListener('keydown', esc);
+    return () => { removeEventListener('pointerdown', out); removeEventListener('keydown', esc); };
+  }, [open]);
+  const pick = (f: () => void) => () => { f(); setOpen(false); };
+  return (
+    <div className="snow-menu" ref={box}>
+      <button className="icon-btn" aria-pressed={on} aria-haspopup={on ? 'menu' : undefined} aria-expanded={on ? open : undefined}
+        onClick={() => (on ? setOpen(!open) : update((p) => { p.snow = true; }))} title={on ? 'Қар' : 'Қарды қосу'}>
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 3.5l3 2 3-2M9 20.5l3-2 3 2M4 10.6l3.4-.2-1.5-3M20 13.4l-3.4.2 1.5 3M4 13.4l3.4.2-1.5 3M20 10.6l-3.4-.2 1.5-3" /></svg>
+        <span className="sr">{on ? 'Қар мәзірі' : 'Қар өшірулі, қосу'}</span>
+      </button>
+      {open && (
+        <div className="snow-pop" role="menu">
+          <button role="menuitem" onClick={pick(() => snowCommand('plow'))}><span aria-hidden>🚜</span> Трактормен тазалау</button>
+          <button role="menuitem" onClick={pick(() => snowCommand('burst'))}><span aria-hidden>❄️</span> Қалың қар жаусын</button>
+          <button role="menuitem" onClick={pick(() => update((p) => { p.snow = false; }))}><span aria-hidden>⏻</span> Қарды өшіру</button>
+        </div>
+      )}
+    </div>
   );
 }
