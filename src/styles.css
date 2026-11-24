@@ -1332,3 +1332,16 @@ dialog.onboard::backdrop { background: rgba(9, 10, 11, .62); backdrop-filter: bl
 /* z-index: -1 — қар мәтін мен карточкалардың артында, тек бос жерлерде көрінеді */
 .snow-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
 @media print { .snow-canvas { display: none; } }
+/* Трактор мен шашырандылар — мәтіннің үстінде, бірақ тышқанның басуын ұстамайды */
+.snow-fx { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 46; pointer-events: none; }
+/* Шапкадағы ❄ мәзірі: трактор, қалың қар, өшіру */
+.snow-menu { position: relative; }
+.snow-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; display: grid; min-width: 220px; padding: 6px; border: 1px solid var(--line2); background: var(--card); box-shadow: 0 14px 34px rgba(0, 0, 0, .25); }
+.snow-pop button { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 8px 12px; border: 0; background: none; color: var(--fg); font: inherit; font-size: .9rem; text-align: left; cursor: pointer; }
+.snow-pop button:hover, .snow-pop button:focus-visible { background: var(--card2); color: var(--accent-ink); }
+/* Жаңа жылдық гирлянда шапканың астында */
+.top { position: sticky; }
+.garland { position: absolute; left: 0; top: 100%; pointer-events: none; overflow: visible; }
+.garland .bulb { filter: drop-shadow(0 0 3px currentColor); animation: bulb 2.4s ease-in-out infinite; }
+@keyframes bulb { 0%, 100% { opacity: 1; } 50% { opacity: .35; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .garland .bulb { animation: none; } }
