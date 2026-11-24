@@ -22,6 +22,8 @@ export interface Progress {
   labRuns?: string[];
   /** Таныстыру нұсқаулығы көрсетілді ме */
   onboarded?: boolean;
+  /** Қар эффектісі (әдепкі бойынша қосулы; false — өшірілген) */
+  snow?: boolean;
   /** Флэш-карталар: карта id → Лейтнер қорабы (0 — білмейді, 3 — толық меңгерді) және соңғы қаралған уақыт */
   cards?: Record<string, { box: number; ts: number }>;
 }
@@ -182,7 +184,7 @@ export function rateCard(id: string, known: boolean) {
 }
 
 export function resetProgress() {
-  const keep = { theme: state.theme, motion: state.motion, formula: state.formula, custom: state.custom, name: state.name, onboarded: state.onboarded };
+  const keep = { theme: state.theme, motion: state.motion, formula: state.formula, custom: state.custom, name: state.name, onboarded: state.onboarded, snow: state.snow };
   state = { ...empty(), ...keep };
   save();
   listeners.forEach((l) => l());

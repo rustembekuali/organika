@@ -1327,3 +1327,8 @@ dialog.onboard::backdrop { background: rgba(9, 10, 11, .62); backdrop-filter: bl
 .sig-stage .sig { max-width: 420px; margin: 0 auto; }
 .sig-cap { position: absolute; left: 0; right: 0; bottom: 9px; text-align: center; font-size: .66rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .38); pointer-events: none; }
 
+
+/* Қар эффектісі (шапкадағы ❄ түймесімен өшіріледі) */
+/* z-index: -1 — қар мәтін мен карточкалардың артында, тек бос жерлерде көрінеді */
+.snow-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+@media print { .snow-canvas { display: none; } }
